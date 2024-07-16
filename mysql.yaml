@@ -1,0 +1,16 @@
+version: '3'
+services:
+  mysqlserver:
+    image: mysql
+    ports:
+     - 3306:3306
+    environment:
+     - MY_SQL_USERNAME=root
+     - MY_SQL_PASSWORD=password
+  postgreserver:D
+    image: postgres
+    ports:
+     - 5432:5432
+    environment:
+     - POSTGRES_USERNAME=root
+     - POSTGRES_PASSWORD=password
