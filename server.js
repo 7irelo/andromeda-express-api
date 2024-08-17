@@ -1,57 +1,42 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const path = require("path");
-const logger = require("./middlewares/logger");
-const sequelize = require('./config/database');
-const authRoutes = require("./routes/authRoutes");
-const rootRoutes = require("./routes/rootRoutes");
-const userRoutes = require("./routes/userRoutes");
-const accountRoutes = require("./routes/accountRoutes");
-const creditCardRoutes = require("./routes/creditCardRoutes");
-const transactionRoutes = require("./routes/transactionRoutes");
-const loansRoutes = require("./routes/loansRoutes");
-const savingsAccountRoutes = require("./routes/savingsAccountRoutes");
-const fixedDepositRoutes = require("./routes/fixedDepositRoutes");
-const supportTicketRoutes = require("./routes/supportTicketRoutes");
-const paypalRoutes = require('./routes/paypalRoutes');
-const payfastRoutes = require('./routes/payfastRoutes');
+const express = require('express');
+const bodyParser = require('body-parser');
+const userRoutes = require('./route/user');
+const chatRoutes = require('./route/chat');
+const messageRoutes = require('./route/message');
+const commentRoutes = require('./route/comment');
+const groupRoutes = require('./route/group');
+const groupMessageRoutes = require('./route/groupMessage');
+const groupMembershipRoutes = require('./route/groupMembership');
+const likeRoutes = require('./route/like');
+const pageRoutes = require('./route/page');
+const pagePostRoutes = require('./route/pagePost');
+const postRoutes = require('./route/post');
+const productRoutes = require('./route/product');
+const productCommentRoutes = require('./route/productComment');
+const productLikeRoutes = require('./route/productLike');
+const tagRoutes = require('./route/tag');
 
-// Config
-dotenv.config();
 const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, "public")));
-app.use(logger);
+app.use(bodyParser.json());
 
-// Routes
-app.use('/auth', authRoutes);
-app.use('/', rootRoutes);
 app.use('/users', userRoutes);
-app.use('/accounts', accountRoutes);
-app.use('/credit-cards', creditCardRoutes);
-app.use('/transactions', transactionRoutes);
-app.use('/loans', loansRoutes);
-app.use('/savings-accounts', savingsAccountRoutes);
-app.use('/fixed-deposits', fixedDepositRoutes);
-app.use('/support-tickets', supportTicketRoutes);
-app.use('/api/paypal', paypalRoutes);
-app.use('/api/payfast', payfastRoutes);
+app.use('/chats', chatRoutes);
+app.use('/messages', messageRoutes);
+app.use('/comments', commentRoutes);
+app.use('/groups', groupRoutes);
+app.use('/groupMessages', groupMessageRoutes);
+app.use('/groupMemberships', groupMembershipRoutes);
+app.use('/likes', likeRoutes);
+app.use('/pages', pageRoutes);
+app.use('/pagePosts', pagePostRoutes);
+app.use('/posts', postRoutes);
+app.use('/products', productRoutes);
+app.use('/productComments', productCommentRoutes);
+app.use('/productLikes', productLikeRoutes);
+app.use('/tags', tagRoutes);
 
-// Initialize Sequelize and start server
 const PORT = process.env.PORT || 3000;
-sequelize.authenticate()
-  .then(() => {
-    console.log('Connection has been established successfully.');
-    return sequelize.sync({ alter: true });
-  })
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  })
-  .catch((error) => {
-    console.error('Unable to connect to the database:', error);
-  });
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});

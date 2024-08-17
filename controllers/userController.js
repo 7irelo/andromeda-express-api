@@ -1,62 +1,74 @@
-const { User } = require('../models/associations');
+const User = require('../model/user');
 
-const createUser = async (req, res) => {
-  try {
-    const user = await User.create(req.body);
-    res.status(201).json({ success: true, user });
-  } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ success: false, message: "Server error", error });
-  }
-};
-
-const getUser = async (req, res) => {
-  const { idNumber } = req.params;
-  try {
-    const user = await User.findByPk(idNumber);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+exports.createUser = async (req, res) => {
+    try {
+        const user = await User.create(req.body);
+        res.status(201).json(user.toJson());
+    } catch (err) {
+        res.status(400).json({ error: 'Failed to create user', details: err.message });
     }
-    res.status(200).json({ success: true, user });
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    res.status(500).json({ success: false, message: "Server error", error });
-  }
 };
 
-const updateUser = async (req, res) => {
-  const { idNumber } = req.params;
-  try {
-    const user = await User.findByPk(idNumber);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+exports.getUserById = async (req, res) => {
+    try {
+        const user = await User.find(req.params.id);
+        if (user) {
+            res.json(user.toJson());
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch user', details: err.message });
     }
-    await user.update(req.body);
-    res.status(200).json({ success: true, user });
-  } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ success: false, message: "Server error", error });
-  }
 };
 
-const deleteUser = async (req, res) => {
-  const { idNumber } = req.params;
-  try {
-    const user = await User.findByPk(idNumber);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.all();
+        res.json(users.map(user => user.toJson()));
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch users', details: err.message });
     }
-    await user.destroy();
-    res.status(200).json({ success: true, message: "User deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({ success: false, message: "Server error", error });
-  }
 };
 
-module.exports = {
-  createUser,
-  getUser,
-  updateUser,
-  deleteUser,
+exports.updateUser = async (req, res) => {
+    try {
+        const user = await User.find(req.params.id);
+        if (user) {
+            await user.update(req.body);
+            res.json(user.toJson());
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (err) {
+        res.status(400).json({ error: 'Failed to update user', details: err.message });
+    }
+};
+
+exports.patchUser = async (req, res) => {
+    try {
+        const user = await User.find(req.params.id);
+        if (user) {
+            await user.update(req.body, true);
+            res.json(user.toJson());
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (err) {
+        res.status(400).json({ error: 'Failed to update user', details: err.message });
+    }
+};
+
+exports.deleteUser = async (req, res) => {
+    try {
+        const user = await User.find(req.params.id);
+        if (user) {
+            await user.delete();
+            res.json({ message: 'User deleted successfully' });
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to delete user', details: err.message });
+    }
 };
